@@ -10,6 +10,7 @@ import asyncio
 import json
 from app.models.product_models import Product, Product_Update
 from app import settings
+import requests
 
 # only needed for psycopg 3 - replace postgresql
 # with postgresql+psycopg in settings.DATABASE_URL
@@ -76,6 +77,17 @@ app = FastAPI(lifespan=lifespan, title="Hello World API with DB",
 def get_session():
     with Session(engine) as session:
         yield session
+
+
+@app.get("/get_token")
+def generate_token(user_name: str):
+    try:
+        res = requests.get(url="http://172.25.176.1:8005/access_token", params={"user_name": user_name})
+        print(res.raise_for_status())
+        return res.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Request failed: {e}")
+        return res.json()
 
 
 @app.get("/")

@@ -22,6 +22,39 @@ services:
         - broker
     ports:
       - "8004:8000"  # Expose container port 8000 to host port 8000
+  auth_service:
+    build:
+      context: ./authentication_service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./authentication_service:/code  # Sync local development directory with the container
+    depends_on:
+        - broker
+    ports:
+      - "8005:8000"  # Expose container port 8000 to host port 8000
+  user_service:
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./user_service:/code  # Sync local development directory with the container
+    depends_on:
+        - auth_service
+        - user_service_postgres_db
+    ports:
+      - "8006:8000"  # Expose container port 8000 to host port 8000
+  user_service_postgres_db:
+    image: postgres:latest  # Use the official PostgreSQL image
+    restart: always
+    container_name: UserServicePostgresCont
+    environment:
+        - POSTGRES_USER=ammarsamnani
+        - POSTGRES_PASSWORD=user_service
+        - POSTGRES_DB=userdatabase
+    ports:
+        - '5435:5432'
+    volumes:
+        - user_service_postgres_db:/var/lib/postgresql/data
   product_service:
     build:
       context: ./product_service
@@ -33,7 +66,6 @@ services:
         - broker
     ports:
       - "8003:8000"  # Expose container port 8000 to host port 8000
-    
   product_service_postgres_db:
     image: postgres:latest  # Use the official PostgreSQL image
     restart: always
@@ -106,6 +138,8 @@ volumes:
   postgres_db:
     driver: local
   product_service_postgres_db:
+    driver: local
+  user_service_postgres_db:
     driver: local
 networks:
   default:
