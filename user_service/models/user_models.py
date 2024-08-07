@@ -12,4 +12,4 @@ class User_Update(SQLModel):
     full_name: str
     email: str
     number: str
-    address: str | None
+    address: str | None = Field(default=None)
