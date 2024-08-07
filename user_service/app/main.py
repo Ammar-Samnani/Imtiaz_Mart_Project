@@ -60,7 +60,7 @@ def read_all_users(session: Annotated[Session, Depends(get_session)]):
 @app.post("/create_user")
 def create_user(user: User, session: Annotated[Session, Depends(get_session)]):
     try:
-        res = requests.get(url="http://172.22.208.1:8005/access_token", params={"user_name": user.full_name})
+        res = requests.get(url="http://172.22.208.1:8005/access_token", params={"user_name": user.full_name}) ##Update IP if run on different system
     except requests.exceptions.RequestException as e:
         print(f"Request failed: {e}")
     else:
